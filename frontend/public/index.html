@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudLibrary — Open Book Space</title>
+  <meta name="description" content="Access thousands of free public domain books. Upload, download, and build your personal reading universe." />
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<!-- ═══════════════════════════ NAVIGATION ═══════════════════════════ -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo" data-route="/">
+      <div class="nav-logo-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M3 4h7v1.5H3V4zm0 3h7v1.5H3V7zm0 3h5v1.5H3V10zm9-7h3v10h-3V3z" fill="white"/>
+        </svg>
+      </div>
+      <span>Cloud<strong>Library</strong></span>
+    </a>
+
+    <div class="nav-links" id="nav-links">
+      <a href="/" data-route="/" class="nav-link">Home</a>
+      <a href="/library" data-route="/library" class="nav-link">Library</a>
+      <a href="/upload" data-route="/upload" class="nav-link nav-link-auth">Upload</a>
+    </div>
+
+    <div class="nav-actions" id="nav-actions">
+      <button class="nav-search-hint" id="nav-search-open">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Search
+        <span class="kbd">⌘K</span>
+      </button>
+      <a href="/login" data-route="/login" class="btn btn-ghost btn-sm" id="btn-login">Sign In</a>
+      <a href="/register" data-route="/register" class="btn btn-primary btn-sm" id="btn-register">Join Free</a>
+      <div class="user-menu" id="user-menu" style="display:none">
+        <button class="user-avatar" id="user-avatar-btn" title="Account">
+          <span id="user-initial">U</span>
+        </button>
+        <div class="dropdown" id="user-dropdown">
+          <div class="dropdown-header">
+            <div class="dh-name" id="dropdown-name">User</div>
+            <div class="dh-email" id="dropdown-email"></div>
+          </div>
+          <a href="/profile" data-route="/profile" class="dropdown-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            My Profile
+          </a>
+          <a href="/my-library" data-route="/my-library" class="dropdown-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            My Library
+          </a>
+          <a href="/want-to-read" data-route="/want-to-read" class="dropdown-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            Want to Read
+          </a>
+          <a href="/contributions" data-route="/contributions" class="dropdown-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            My Contributions
+          </a>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item text-danger" id="btn-logout">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+    <button class="menu-toggle" id="menu-toggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════ APP ROOT ═══════════════════════════ -->
+<main id="app">
+  <div class="loading-screen" id="loading-screen">
+    <div class="loader"></div>
+  </div>
+</main>
+
+<!-- ═══════════════════════════ TOASTS ═══════════════════════════ -->
+<div id="toast-container"></div>
+
+<!-- ═══════════════════════════ PAGE TEMPLATES ═══════════════════════════ -->
+
+<!-- HOME -->
+<template id="tpl-home">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero-content">
+      <div class="hero-badge"><span class="hero-badge-dot"></span>Free &amp; Open — 241+ Public Domain Classics</div>
+      <h1 class="hero-title">Discover, Read &amp;<br>Share Knowledge</h1>
+      <p class="hero-sub">The world's greatest literature, free forever. Upload, download and build your personal reading universe in the cloud.</p>
+      <div class="hero-search">
+        <div class="search-box">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="hero-search-input" placeholder="Search by title, author, or genre…" autocomplete="off" />
+          <div class="search-shortcut"><span class="kbd">⌘</span><span class="kbd">K</span></div>
+          <button class="btn btn-primary" id="hero-search-btn">Search</button>
+        </div>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num" id="stat-books">241</span><span class="stat-label">Books</span></div>
+        <div class="stat"><span class="stat-num" id="stat-genres">0</span><span class="stat-label">Genres</span></div>
+        <div class="stat"><span class="stat-num" id="stat-downloads">0</span><span class="stat-label">Downloads</span></div>
+        <div class="stat"><span class="stat-num">100%</span><span class="stat-label">Free</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURED BOOKS -->
+  <section class="home-section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Featured Books</h2>
+          <p class="section-sub">Hand-picked classics from our collection</p>
+        </div>
+        <a href="/library" data-route="/library" class="see-all">Browse all <span>→</span></a>
+      </div>
+      <div class="book-grid" id="featured-grid">
+        <div class="skeleton-grid" id="featured-skeleton"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MOST DOWNLOADED -->
+  <section class="home-section home-section-alt">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Most Downloaded</h2>
+          <p class="section-sub">The books readers keep coming back to</p>
+        </div>
+        <a href="/library?sort=downloads" data-route="/library?sort=downloads" class="see-all">See all <span>→</span></a>
+      </div>
+      <div class="book-row" id="popular-grid"></div>
+    </div>
+  </section>
+
+  <!-- BROWSE BY GENRE -->
+  <section class="home-section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Browse by Genre</h2>
+          <p class="section-sub">Find your next read by category</p>
+        </div>
+      </div>
+      <div class="genre-grid" id="genre-chips"></div>
+    </div>
+  </section>
+
+  <!-- BROWSE BY ERA -->
+  <section class="home-section home-section-alt">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Browse by Era</h2>
+          <p class="section-sub">Explore literature across the ages</p>
+        </div>
+      </div>
+      <div class="era-grid" id="era-grid">
+        <div class="era-card" data-route="/library?search=ancient">
+          <div class="era-card-year">800 BC – 500 AD</div>
+          <div class="era-card-name">Ancient World</div>
+          <div class="era-card-desc">Homer, Plato, Virgil, Marcus Aurelius</div>
+        </div>
+        <div class="era-card" data-route="/library?search=medieval">
+          <div class="era-card-year">500 – 1500</div>
+          <div class="era-card-name">Medieval</div>
+          <div class="era-card-desc">Dante, Chaucer, Boccaccio, Beowulf</div>
+        </div>
+        <div class="era-card" data-route="/library?search=renaissance">
+          <div class="era-card-year">1500 – 1700</div>
+          <div class="era-card-name">Renaissance</div>
+          <div class="era-card-desc">Shakespeare, Cervantes, Milton, Defoe</div>
+        </div>
+        <div class="era-card" data-route="/library?search=1800">
+          <div class="era-card-year">1800 – 1850</div>
+          <div class="era-card-name">Romantic Era</div>
+          <div class="era-card-desc">Austen, Byron, Shelley, Keats, Scott</div>
+        </div>
+        <div class="era-card" data-route="/library?search=victorian">
+          <div class="era-card-year">1850 – 1900</div>
+          <div class="era-card-name">Victorian</div>
+          <div class="era-card-desc">Dickens, Hardy, Tolstoy, Dostoevsky</div>
+        </div>
+        <div class="era-card" data-route="/library?search=1900">
+          <div class="era-card-year">1900 – 1930</div>
+          <div class="era-card-name">Modern Age</div>
+          <div class="era-card-desc">Conrad, London, Wharton, Forster, Joyce</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEW ADDITIONS -->
+  <section class="home-section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Recently Added</h2>
+          <p class="section-sub">The latest additions to our collection</p>
+        </div>
+        <a href="/library?sort=created_at" data-route="/library?sort=created_at" class="see-all">See all <span>→</span></a>
+      </div>
+      <div class="book-row" id="recent-grid"></div>
+    </div>
+  </section>
+
+  <!-- GENRE ROW: ADVENTURE -->
+  <section class="home-section home-section-alt">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Adventure &amp; Action</h2>
+          <p class="section-sub">From pirates to alien worlds</p>
+        </div>
+        <a href="/library?genre=Adventure" data-route="/library?genre=Adventure" class="see-all">See all <span>→</span></a>
+      </div>
+      <div class="book-row" id="genre-adventure-grid"></div>
+    </div>
+  </section>
+
+  <!-- GENRE ROW: HORROR -->
+  <section class="home-section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Horror &amp; Gothic</h2>
+          <p class="section-sub">Dark tales and supernatural terror</p>
+        </div>
+        <a href="/library?genre=Horror" data-route="/library?genre=Horror" class="see-all">See all <span>→</span></a>
+      </div>
+      <div class="book-row" id="genre-horror-grid"></div>
+    </div>
+  </section>
+
+  <!-- GENRE ROW: ROMANCE -->
+  <section class="home-section home-section-alt">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Romance &amp; Love</h2>
+          <p class="section-sub">Timeless stories of the heart</p>
+        </div>
+        <a href="/library?genre=Romance" data-route="/library?genre=Romance" class="see-all">See all <span>→</span></a>
+      </div>
+      <div class="book-row" id="genre-romance-grid"></div>
+    </div>
+  </section>
+
+  <!-- GENRE ROW: SCI-FI -->
+  <section class="home-section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Science Fiction</h2>
+          <p class="section-sub">Visions of tomorrow from yesterday</p>
+        </div>
+        <a href="/library?genre=Science+Fiction" data-route="/library?genre=Science Fiction" class="see-all">See all <span>→</span></a>
+      </div>
+      <div class="book-row" id="genre-scifi-grid"></div>
+    </div>
+  </section>
+
+  <!-- PHILOSOPHY & NON-FICTION -->
+  <section class="home-section home-section-alt">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Philosophy &amp; Ideas</h2>
+          <p class="section-sub">Works that changed how we think</p>
+        </div>
+        <a href="/library?genre=Philosophy" data-route="/library?genre=Philosophy" class="see-all">See all <span>→</span></a>
+      </div>
+      <div class="book-row" id="genre-philosophy-grid"></div>
+    </div>
+  </section>
+
+  <!-- COMMUNITY STATS BANNER -->
+  <section class="home-section">
+    <div class="container">
+      <div class="stats-banner">
+        <div class="stats-banner-item">
+          <div class="stats-banner-num" id="stat-banner-books">241</div>
+          <div class="stats-banner-label">Books Available</div>
+        </div>
+        <div class="stats-banner-divider"></div>
+        <div class="stats-banner-item">
+          <div class="stats-banner-num" id="stat-banner-genres">13</div>
+          <div class="stats-banner-label">Genres</div>
+        </div>
+        <div class="stats-banner-divider"></div>
+        <div class="stats-banner-item">
+          <div class="stats-banner-num">Free</div>
+          <div class="stats-banner-label">Always &amp; Forever</div>
+        </div>
+        <div class="stats-banner-divider"></div>
+        <div class="stats-banner-item">
+          <div class="stats-banner-num">Cloud</div>
+          <div class="stats-banner-label">Powered</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="home-section home-section-alt">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">How CloudLibrary Works</h2>
+          <p class="section-sub">Everything you need to read, save and share</p>
+        </div>
+      </div>
+      <div class="how-grid">
+        <div class="how-card">
+          <div class="how-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+          <h3 class="how-title">Search &amp; Discover</h3>
+          <p class="how-desc">Browse 241+ public domain classics by title, author, genre or era. Use filters to find exactly what you're looking for.</p>
+        </div>
+        <div class="how-card">
+          <div class="how-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </div>
+          <h3 class="how-title">Download Free</h3>
+          <p class="how-desc">Every book is free to download — no sign-up required for public domain titles. Formats include TXT, PDF, and EPUB.</p>
+        </div>
+        <div class="how-card">
+          <div class="how-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          </div>
+          <h3 class="how-title">Build Your Library</h3>
+          <p class="how-desc">Create an account to save books to your personal library, track your reading progress and maintain a Want to Read list.</p>
+        </div>
+        <div class="how-card">
+          <div class="how-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <h3 class="how-title">Contribute</h3>
+          <p class="how-desc">Upload your own public domain books to share with the world. Help grow the collection for readers everywhere.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-card">
+        <div class="cta-icon-wrap">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="hsl(217,91%,65%)" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <h2>Share Your Books with the World</h2>
+        <p>Have a public domain book? Upload it to CloudLibrary and make it accessible to readers everywhere — for free, forever.</p>
+        <div class="cta-btns">
+          <a href="/upload" data-route="/upload" class="btn btn-primary btn-xl" id="cta-upload-btn">Upload a Book</a>
+          <a href="/register" data-route="/register" class="btn btn-secondary btn-xl" id="cta-register-btn">Create Account</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<!-- LIBRARY -->
+<template id="tpl-library">
+  <section class="page-header">
+    <div class="container">
+      <h1>Library</h1>
+      <p>Browse our collection of public domain classics</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <div class="library-toolbar">
+        <div class="search-box search-sm">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="lib-search" placeholder="Search books…" autocomplete="off" />
+        </div>
+        <div class="filters">
+          <select id="lib-genre" class="select"><option value="all">All Genres</option></select>
+          <select id="lib-sort" class="select">
+            <option value="created_at">Newest</option>
+            <option value="downloads">Most Downloaded</option>
+            <option value="title">A–Z Title</option>
+            <option value="year">Year</option>
+          </select>
+        </div>
+      </div>
+      <div class="genre-pills" id="lib-genre-pills"></div>
+      <p class="results-count" id="results-count"></p>
+      <div class="book-grid" id="library-grid"></div>
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </section>
+</template>
+
+<!-- BOOK DETAIL -->
+<template id="tpl-book">
+  <div class="book-detail-container" id="book-detail-container">
+    <div class="loading-inline"><div class="loader"></div><span>Loading book…</span></div>
+  </div>
+</template>
+
+<!-- LOGIN -->
+<template id="tpl-login">
+  <section class="auth-section">
+    <div class="auth-left">
+      <div class="auth-card">
+        <div class="auth-logo">
+          <div class="nav-logo-icon">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 4h7v1.5H3V4zm0 3h7v1.5H3V7zm0 3h5v1.5H3V10zm9-7h3v10h-3V3z" fill="white"/></svg>
+          </div>
+          <span style="font-weight:700;font-size:1.05rem">CloudLibrary</span>
+        </div>
+        <h2>Welcome back</h2>
+        <p class="auth-sub">Sign in to your reading account</p>
+        <form id="login-form" class="auth-form" novalidate>
+          <div class="form-group">
+            <label for="login-email">Email or Username</label>
+            <input type="text" id="login-email" placeholder="you@example.com" autocomplete="email" required />
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <div class="input-wrap">
+              <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required />
+              <button type="button" class="toggle-pw" data-target="login-password">Show</button>
+            </div>
+          </div>
+          <div id="login-error" class="form-error">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span></span>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" style="min-height:44px">
+            <span class="btn-text">Sign In</span>
+          </button>
+        </form>
+        <p class="auth-switch">Don't have an account? <a href="/register" data-route="/register">Join free</a></p>
+      </div>
+    </div>
+    <div class="auth-right">
+      <div class="auth-art">
+        <div class="auth-art-books">
+          <div class="auth-art-book" style="width:52px;height:72px;background:linear-gradient(135deg,#1a237e,#3b82f6);border-radius:6px 2px 2px 6px"></div>
+          <div class="auth-art-book" style="width:48px;height:80px;background:linear-gradient(135deg,#4a1942,#8b5cf6);border-radius:6px 2px 2px 6px"></div>
+          <div class="auth-art-book" style="width:44px;height:68px;background:linear-gradient(135deg,#1b5e20,#10b981);border-radius:6px 2px 2px 6px"></div>
+          <div class="auth-art-book" style="width:50px;height:76px;background:linear-gradient(135deg,#b71c1c,#ef4444);border-radius:6px 2px 2px 6px"></div>
+        </div>
+        <h3>Your personal cloud library</h3>
+        <p>Save books, track your reading, and discover new classics from anywhere.</p>
+      </div>
+    </div>
+  </section>
+</template>
+
+<!-- REGISTER -->
+<template id="tpl-register">
+  <section class="auth-section">
+    <div class="auth-left">
+      <div class="auth-card">
+        <div class="auth-logo">
+          <div class="nav-logo-icon">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 4h7v1.5H3V4zm0 3h7v1.5H3V7zm0 3h5v1.5H3V10zm9-7h3v10h-3V3z" fill="white"/></svg>
+          </div>
+          <span style="font-weight:700;font-size:1.05rem">CloudLibrary</span>
+        </div>
+        <h2>Create your account</h2>
+        <p class="auth-sub">Free forever. No credit card needed.</p>
+        <form id="register-form" class="auth-form" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="reg-username">Username</label>
+              <input type="text" id="reg-username" placeholder="reader42" autocomplete="username" required />
+            </div>
+            <div class="form-group">
+              <label for="reg-displayname">Display Name</label>
+              <input type="text" id="reg-displayname" placeholder="Your Name" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="reg-email">Email</label>
+            <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email" required />
+          </div>
+          <div class="form-group">
+            <label for="reg-password">Password</label>
+            <div class="input-wrap">
+              <input type="password" id="reg-password" placeholder="Min. 6 characters" autocomplete="new-password" required />
+              <button type="button" class="toggle-pw" data-target="reg-password">Show</button>
+            </div>
+          </div>
+          <div id="register-error" class="form-error">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span></span>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" style="min-height:44px">
+            <span class="btn-text">Create Account</span>
+          </button>
+        </form>
+        <p class="auth-switch">Already have an account? <a href="/login" data-route="/login">Sign in</a></p>
+      </div>
+    </div>
+    <div class="auth-right">
+      <div class="auth-art">
+        <div class="auth-art-books">
+          <div class="auth-art-book" style="width:44px;height:64px;background:linear-gradient(135deg,#064e3b,#059669);border-radius:6px 2px 2px 6px"></div>
+          <div class="auth-art-book" style="width:56px;height:80px;background:linear-gradient(135deg,#1a237e,#3b82f6);border-radius:6px 2px 2px 6px"></div>
+          <div class="auth-art-book" style="width:48px;height:72px;background:linear-gradient(135deg,#1c0505,#991b1b);border-radius:6px 2px 2px 6px"></div>
+        </div>
+        <h3>Join 1000s of readers</h3>
+        <p>Build your library, track reading progress, and contribute to the global collection.</p>
+      </div>
+    </div>
+  </section>
+</template>
+
+<!-- PROFILE -->
+<template id="tpl-profile">
+  <div class="profile-container" id="profile-container">
+    <div class="loading-inline"><div class="loader"></div><span>Loading profile…</span></div>
+  </div>
+</template>
+
+<!-- MY LIBRARY -->
+<template id="tpl-my-library">
+  <section class="page-header">
+    <div class="container">
+      <h1>My Library</h1>
+      <p>Your personal reading collection</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <div class="tab-bar">
+        <button class="tab-btn active" data-status="all">All <span class="tab-count" id="tab-count-all">0</span></button>
+        <button class="tab-btn" data-status="saved">Saved <span class="tab-count" id="tab-count-saved">0</span></button>
+        <button class="tab-btn" data-status="reading">Reading <span class="tab-count" id="tab-count-reading">0</span></button>
+        <button class="tab-btn" data-status="finished">Finished <span class="tab-count" id="tab-count-finished">0</span></button>
+      </div>
+      <div class="book-grid" id="my-library-grid">
+        <div class="loading-inline"><div class="loader"></div></div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<!-- WANT TO READ -->
+<template id="tpl-want-to-read">
+  <section class="page-header">
+    <div class="container">
+      <h1>Want to Read</h1>
+      <p>Your reading wishlist</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <div class="book-grid" id="wtr-grid">
+        <div class="loading-inline"><div class="loader"></div></div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<!-- CONTRIBUTIONS -->
+<template id="tpl-contributions">
+  <section class="page-header">
+    <div class="container">
+      <h1>My Contributions</h1>
+      <p>Books you've uploaded to the community</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <div class="contributions-header">
+        <a href="/upload" data-route="/upload" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Upload New Book
+        </a>
+      </div>
+      <div class="book-grid" id="contrib-grid">
+        <div class="loading-inline"><div class="loader"></div></div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<!-- UPLOAD -->
+<template id="tpl-upload">
+  <section class="page-header">
+    <div class="container">
+      <h1>Upload a Book</h1>
+      <p>Share public domain books with the global community</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <div class="upload-card">
+        <div class="upload-steps">
+          <div class="upload-step active" data-step="1">
+            <div class="step-num">1</div>
+            <span class="step-label">Book Info</span>
+          </div>
+          <div class="upload-step" data-step="2">
+            <div class="step-num">2</div>
+            <span class="step-label">Upload File</span>
+          </div>
+          <div class="upload-step" data-step="3">
+            <div class="step-num">3</div>
+            <span class="step-label">Publish</span>
+          </div>
+        </div>
+        <form id="upload-form" class="upload-form" enctype="multipart/form-data">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Book Title <span style="color:var(--danger)">*</span></label>
+              <input type="text" id="up-title" placeholder="e.g. Moby Dick" required />
+            </div>
+            <div class="form-group">
+              <label>Author <span style="color:var(--danger)">*</span></label>
+              <input type="text" id="up-author" placeholder="e.g. Herman Melville" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="up-desc" rows="4" placeholder="A brief description of the book…"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Genre</label>
+              <select id="up-genre" class="select">
+                <option>Classic</option><option>Adventure</option><option>Romance</option>
+                <option>Mystery</option><option>Horror</option><option>Science Fiction</option>
+                <option>Fantasy</option><option>Historical Fiction</option><option>Drama</option>
+                <option>Poetry</option><option>Philosophy</option><option>Biography</option>
+                <option>Science</option><option>General</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Language</label>
+              <select id="up-lang" class="select">
+                <option>English</option><option>Indonesian</option><option>French</option>
+                <option>German</option><option>Spanish</option><option>Russian</option><option>Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Year Published</label>
+              <input type="number" id="up-year" placeholder="e.g. 1851" min="1" max="2024" />
+            </div>
+            <div class="form-group">
+              <label>Pages</label>
+              <input type="number" id="up-pages" placeholder="e.g. 378" min="1" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Book File <span style="color:var(--danger)">*</span> <span class="label-note">Max 50MB</span></label>
+            <div class="file-drop" id="file-drop">
+              <input type="file" id="up-file" accept=".pdf,.txt,.epub,.mobi,.doc,.docx,.rtf" hidden />
+              <div class="file-drop-inner" id="file-drop-inner">
+                <div class="file-drop-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="hsl(217,91%,65%)" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                </div>
+                <p>Drag &amp; drop your book file here<br/><span>or <label for="up-file" class="link">browse files</label></span></p>
+                <div class="file-drop-formats">
+                  <span class="format-badge">.pdf</span>
+                  <span class="format-badge">.epub</span>
+                  <span class="format-badge">.txt</span>
+                  <span class="format-badge">.mobi</span>
+                  <span class="format-badge">.doc</span>
+                </div>
+              </div>
+              <div class="file-info-bar" id="file-info" style="display:none">
+                <svg class="file-info-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <div><div class="file-info-name" id="file-info-name"></div><div class="file-info-size" id="file-info-size"></div></div>
+                <button type="button" class="btn btn-ghost btn-sm" id="btn-clear-file" style="margin-left:auto">✕ Change</button>
+              </div>
+            </div>
+          </div>
+          <div id="upload-error" class="form-error">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span></span>
+          </div>
+          <div id="upload-progress" class="progress-wrap" style="display:none">
+            <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+            <span id="progress-text">Uploading…</span>
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg" id="upload-submit">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span class="btn-text">Upload Book</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+</template>
+
+<!-- 404 -->
+<template id="tpl-404">
+  <section class="error-section">
+    <div class="container text-center">
+      <div class="error-code">404</div>
+      <h2 style="font-size:1.6rem;margin-bottom:var(--space-3)">Page Not Found</h2>
+      <p style="color:var(--text-muted);margin-bottom:var(--space-6)">The page you're looking for doesn't exist.</p>
+      <a href="/" data-route="/" class="btn btn-primary btn-lg">Go Home</a>
+    </div>
+  </section>
+</template>
+
+<script src="/js/api.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>
