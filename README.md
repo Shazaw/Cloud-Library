@@ -604,4 +604,32 @@ All books are in the **public domain** and sourced from **Project Gutenberg** (g
 
 ---
 
+## Screenshots
+
+### Main Page
+<img width="1919" height="941" alt="image" src="https://github.com/user-attachments/assets/0ee1a277-b696-4804-a78e-a4678f147a2b" />
+
+
+
+### Book Page
+<img width="1919" height="936" alt="image" src="https://github.com/user-attachments/assets/b545b74b-48f5-47eb-8938-a8aaae254326" />
+
+
+
+### Profile Page
+<img width="1919" height="942" alt="image" src="https://github.com/user-attachments/assets/922480b8-cbbe-4644-967c-faa1080b9ef0" />
+
+
+
+### Upload Page
+<img width="1919" height="938" alt="image" src="https://github.com/user-attachments/assets/755d8108-0f5f-4882-8bc9-9557f4576b78" />
+
+
+
+### Library Search
+<img width="1919" height="939" alt="image" src="https://github.com/user-attachments/assets/e3eadb39-d23a-4d9a-bbc0-8ac74b3a66b0" />
+
+---
+
+
 *CloudLibrary — UGM Cloud Computing Project, Semester 4*
