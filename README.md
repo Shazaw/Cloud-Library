@@ -509,22 +509,6 @@ nginx -t && systemctl reload nginx
 
 ---
 
-## Environment Variables
-
-`backend/.env`:
-
-```
-PORT=3001
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=cloudlibrary
-DB_USER=cloudlib_user
-DB_PASSWORD=CloudLib@2024!
-JWT_SECRET=cl0udl1br4ry_jwt_s3cr3t_k3y_2024_UGM
-```
-
----
-
 ## Project Structure
 
 ```
