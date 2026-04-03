@@ -6,6 +6,11 @@ A full-stack public cloud library platform for discovering, downloading and shar
 **Server:** DigitalOcean Droplet — Ubuntu 24.04 LTS (1 vCPU / 1 GB RAM)
 
 ---
+## Demo Video
+
+https://github.com/user-attachments/assets/1dd80f96-7cd1-44dd-9d33-dd48716dd8f1
+
+---
 
 ## Table of Contents
 
